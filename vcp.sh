@@ -6,21 +6,22 @@
 #Usage: ./vcp.sh <source> <destination> <R> 
 # R si <source> est un répertoire
 #Limites connues : fichiers avec des droits de lecture non autorisé dans un répertoire
-#Dépendances, prérequis: cp
+#Dépendances, prérequis: cp, fonctions de hachage -> CRC32 / SHA1 - 2 - 3 / MD5
 #2020/05/07
 #Numéro de version: 2.0
 #Licence: GNU GPL
 
 #Constantes:
-
+#Nous définissons les chemins absolue des commandes pour les fonctions de hachage
 CRC32="/usr/bin/crc32"
 MD5="/usr/bin/md5sum"
 SHA256="/usr/bin/sha256sum"
 SHA512="/usr/bin/sha512sum"
-
+#par défaut nous utiliserons la fonction de hachage "MD5"
 HACHFUNCT="/usr/bin/md5sum"
 
 #Fonctions:
+#cette fonction permet de vérifié que la copie c'est correctement passée
 Check(){
 
 if [ -e $1 ]
@@ -28,6 +29,7 @@ then
     #destiniation est un répertoire
     if [ -d $2 ]  
     then
+    #prise d'empreinte
       sourceprint=$( $HACHFUNCT $1 | cut -d " " -f 1 )
       destprint=$( $HACHFUNCT $2$1 | cut -d " " -f 1 )
     if [ $sourceprint == $destprint ]
@@ -83,6 +85,7 @@ fi
 }
 
 #PROGRAMME
+#Nous demanbons à l'utilisateur de choisir sa fonction de hachage
 echo "veuillez entrer votre choix de fonction de hachage"
 read printchoice
 
@@ -92,7 +95,6 @@ case $printchoice in
 "sha512") HACHFUNCT=$SHA512;;
 "crc32") HACHFUNCT=$CRC32;;
 esac
-
 
 #args 1 fichier source, args2 fichier destination
 if [ $# -lt 2 ]
