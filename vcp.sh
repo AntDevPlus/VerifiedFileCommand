@@ -11,6 +11,15 @@
 #Numéro de version: 2.0
 #Licence: GNU GPL
 
+#Constantes:
+
+CRC32="/usr/bin/crc32"
+MD5="/usr/bin/md5sum"
+SHA256="/usr/bin/sha256sum"
+SHA512="/usr/bin/sha512sum"
+
+HACHFUNCT="/usr/bin/md5sum"
+
 #Fonctions:
 Check(){
 
@@ -19,8 +28,8 @@ then
     #destiniation est un répertoire
     if [ -d $2 ]  
     then
-      sourceprint=$( md5sum $1 | cut -d " " -f 1 )
-      destprint=$( md5sum $2$1 | cut -d " " -f 1 )
+      sourceprint=$( $HACHFUNCT $1 | cut -d " " -f 1 )
+      destprint=$( $HACHFUNCT $2$1 | cut -d " " -f 1 )
     if [ $sourceprint == $destprint ]
     then
       echo "le fichier a été correctement copié"
@@ -31,8 +40,8 @@ then
 
     #destination est un fichier
     else
-      sourceprint=$( md5sum $1 | cut -d " " -f 1 )
-      destprint=$( md5sum $2 | cut -d " " -f 1 )
+      sourceprint=$( $HACHFUNCT $1 | cut -d " " -f 1 )
+      destprint=$( $HACHFUNCT $2 | cut -d " " -f 1 )
 
     if [ $sourceprint == $destprint ]
     then
@@ -57,8 +66,8 @@ if [ -e $1 ]
 then
     #Nous "pesons" les répertoires pour vérifié l'intégralité
     #Puis on réalise un prise d'empreinte
-    sourceprint=$( du -k $1 | cut -f1 | md5sum | cut -d " " -f 1 )
-    destprint=$( du -k $2 | cut -f1 | md5sum | cut -d " " -f 1 )
+    sourceprint=$( du -k $1 | cut -f1 | $HACHFUNCT | cut -d " " -f 1 )
+    destprint=$( du -k $2 | cut -f1 | $HACHFUNCT | cut -d " " -f 1 )
     #détecte si les fichiers sont identiques
     if [ $sourceprint == $destprint ]
     then
@@ -74,6 +83,17 @@ fi
 }
 
 #PROGRAMME
+echo "veuillez entrer votre choix de fonction de hachage"
+read printchoice
+
+case $printchoice in
+"sha256") HACHFUNCT=$SHA256;;
+"md5") HACHFUNCT=$MD5;;
+"sha512") HACHFUNCT=$SHA512;;
+"crc32") HACHFUNCT=$CRC32;;
+esac
+
+
 #args 1 fichier source, args2 fichier destination
 if [ $# -lt 2 ]
 then
